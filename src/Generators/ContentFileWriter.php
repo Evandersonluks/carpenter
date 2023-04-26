@@ -88,7 +88,7 @@ class ContentFileWriter
         $name = Str::lower(Str::plural($entity));
 
         if (!Str::contains($fileContent, "'$name' => [],")) {
-            $lineNumber = count(file(self::PERMISSIONS)) - 27;
+            $lineNumber = count(file(self::PERMISSIONS)) - 29;
 
             $lineContent = "            '$name' => [],";
 
