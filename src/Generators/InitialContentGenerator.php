@@ -243,12 +243,7 @@ class Save" . $entity . "Request extends CrudRequest
         ]);
     }
 
-    /**
-     * Base rules for both creating and editing the resource.
-     *
-     * @return array
-     */
-    public function baseRules()
+    public function baseRules(): array
     {
         return [
             " . $content . "
@@ -266,32 +261,21 @@ return
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\FormRequest;
 use App\Http\Requests\Save" . $entity . "Request;
 use App\Models\\$entity;
 use App\Repositories\\" . $entity . "Repository;
 
 class " . $entity . "Controller extends CrudController
 {
-    /**
-     * Type of the resource to manage.
-     *
-     * @var string
-     */
-    protected \$resourceType = $entity::class;
+    public function __construct(
+        protected \$resourceType = $entity::class,
+        protected \$repositoryType = " . $entity . "Repository::class
+    ){
+        parent::__construct(\$this->resourceType);
+    }
 
-    /**
-     * Type of the managing repository.
-     *
-     * @var string
-     */
-    protected \$repositoryType = " . $entity . "Repository::class;
-
-    /**
-     * Returns the request that should be used to validate.
-     *
-     * @return Request
-     */
-    protected function formRequest()
+    protected function formRequest(): FormRequest
     {
         return app(Save" . $entity . "Request::class);
     }
