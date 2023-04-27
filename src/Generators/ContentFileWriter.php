@@ -19,7 +19,7 @@ class ContentFileWriter
 
         if (!Str::contains($fileContent, "'policy' => ['list', 'App\\\\Models\\\\$entity'],")) {
             $lineNumber = count(file(self::MENU)) - 39;
-            $route = 'web.' . Str::lower(Str::plural($entity)) . '.index';
+            $route = 'web.' . Str::lower(Str::snake(Str::plural($entity))) . '.index';
 
             $lineContent = "                [
                     'label' => '$pluralEntityTranslated',
@@ -35,7 +35,7 @@ class ContentFileWriter
     public function writeToRoutes(string $entity): void
     {
         $fileContent = file_get_contents(self::ROUTES, true);
-        $name = Str::lower(Str::plural($entity));
+        $name = Str::lower(Str::snake(Str::plural($entity)));
 
         if (!Str::contains($fileContent, "Route::get('/$name', [" . $entity . "Controller::class, 'index'])->name('web.$name.index');")) {
             $lineNumber = count(file(self::ROUTES)) - 3;
@@ -74,7 +74,7 @@ class ContentFileWriter
         if ((count(array_filter($entityFields, function($el) { return (explode('|', $el['type'])[1] == 'select'); })) > 0)) {
             if (!Str::contains($fileContent, 'use App\Http\ViewComposers\\' . $entity . 'ViewComposer;')) {
                 $lineNumber = count(file(self::VIEW_PROVIDERS)) - 11;
-                $lineContent = "        View::composer('" . Str::lower(Str::plural($entity)) . ".*', " . $entity . "ViewComposer::class);";
+                $lineContent = "        View::composer('" . Str::lower(Str::snake(Str::plural($entity))) . ".*', " . $entity . "ViewComposer::class);";
 
                 $this->writer(self::VIEW_PROVIDERS, $lineNumber, $lineContent);
                 $this->writer(self::VIEW_PROVIDERS, 4, 'use App\Http\ViewComposers\\' . $entity . 'ViewComposer;');
@@ -85,7 +85,7 @@ class ContentFileWriter
     public function writeToPermissions(string $entity): void
     {
         $fileContent = file_get_contents(self::PERMISSIONS, true);
-        $name = Str::lower(Str::plural($entity));
+        $name = Str::lower(Str::snake(Str::plural($entity)));
 
         if (!Str::contains($fileContent, "'$name' => [],")) {
             $lineNumber = count(file(self::PERMISSIONS)) - 29;

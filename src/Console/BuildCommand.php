@@ -34,7 +34,7 @@ class BuildCommand extends Command
 
         $var = explode(' ', implode(' ', array_keys($builder)));
         foreach ($var as $value) {
-            shell_exec('chmod 777 -R "resources/views/' . Str::lower(Str::plural(explode('|', $value)[0]) . '"'));
+            shell_exec('chmod 777 -R "resources/views/' . Str::lower(Str::snake(Str::plural(explode('|', $value)[0]))) . '"');
         }
         shell_exec('chown -R sail ' . base_path());
 

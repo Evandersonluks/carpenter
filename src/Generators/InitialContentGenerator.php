@@ -18,7 +18,7 @@ return
 
 namespace App\Models;
 
-class $entity extends Model
+class " . $entity . " extends Model
 {
     /**
      * List of headers for the admin listing table.
@@ -88,7 +88,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('" . Str::lower(Str::plural($entity)) . "');
+        Schema::dropIfExists('" . Str::lower(Str::snake(Str::plural($entity))) . "');
     }
 };
 ";
@@ -113,6 +113,7 @@ return new class extends Migration
     {
         Schema::create('" . Str::lower(Str::snake($entity)) . '_' . $pivot . "', function (Blueprint \$table) {
             \$table->id();
+            \$table->index(['Str::lower(Str::snake($entity))_id', 'Str::singular($pivot)_id']);
             \$table->foreignId('" . Str::lower(Str::snake($entity)) . "_id')->constrained();
             \$table->foreignId('" . Str::singular($pivot) . "_id')->constrained();
             \$table->timestamps();
@@ -310,7 +311,7 @@ class " . $entity . "Policy
     use DeleteResource;
     use RestoreResource;
 
-    protected \$resource = '" . Str::lower(Str::plural($entity)) . "';
+    protected \$resource = '" . Str::lower(Str::snake(Str::plural($entity))) . "';
 }
 ";
 }
@@ -359,7 +360,7 @@ foreach ($entityFields as $name => $props) {
             $nextIsSelectable = explode('|', $nextContent)[1] == 'select';
             if ($nextIsSelectable) {
                 if (Str::contains($name, '_id')) {
-                    $foreignTable = Str::of($name)->beforeLast('_id');
+                    $foreignTable = Str::of($name)->beforeLast('_id')->camel();
                     if (!in_array("use App\Repositories\\" . Str::ucfirst($foreignTable) . "Repository;", $importList)) {
                         $imports .= "use App\Repositories\\" . Str::ucfirst($foreignTable) . "Repository;\n";
                         array_push($importList, "use App\Repositories\\" . Str::ucfirst($foreignTable) . "Repository;");
@@ -375,7 +376,7 @@ foreach ($entityFields as $name => $props) {
                 }
             } else {
                 if (Str::contains($name, '_id')) {
-                    $foreignTable = Str::of($name)->beforeLast('_id');
+                    $foreignTable = Str::of($name)->beforeLast('_id')->camel();
                     if (!in_array("use App\Repositories\\" . Str::ucfirst($foreignTable) . "Repository;", $importList)) {
                         $imports .= "use App\Repositories\\" . Str::ucfirst($foreignTable) . "Repository;";
                         array_push($importList, "use App\Repositories\\" . Str::ucfirst($foreignTable) . "Repository;");
@@ -393,7 +394,7 @@ foreach ($entityFields as $name => $props) {
             continue;
         }
         if (Str::contains($name, '_id')) {
-            $foreignTable = Str::of($name)->beforeLast('_id');
+            $foreignTable = Str::of($name)->beforeLast('_id')->camel();
             if (in_array("use App\Repositories\\" . Str::ucfirst($foreignTable) . "Repository;", $importList)) {
 
             }
@@ -455,12 +456,12 @@ foreach ($entityFields as $key => $props) {
 $content = [];
 
 $content['create'] = "<x-app-layout>
-    @include('" . Str::lower(Str::plural($entity)) . ".form')
+    @include('" . Str::lower(Str::snake(Str::plural($entity))) . ".form')
     @include('layouts.partials.crud.create')
 </x-app-layout>";
 
 $content['edit'] = "<x-app-layout>
-    @include('" . Str::lower(Str::plural($entity)) . ".form')
+    @include('" . Str::lower(Str::snake(Str::plural($entity))) . ".form')
     @include('layouts.partials.crud.edit')
 </x-app-layout>";
 
@@ -502,7 +503,7 @@ $content['form'] = '@section(\'form\')
 @endsection';
 
 $content['index'] = "<x-app-layout>
-    @include('" . Str::lower(Str::plural($entity)) . ".filters')
+    @include('" . Str::lower(Str::snake(Str::plural($entity))) . ".filters')
     @include('layouts.partials.crud.index')
 </x-app-layout>";
 
@@ -547,7 +548,7 @@ public function filterInputsBuilder(string $column, string $translatedName): arr
         'select' =>
         '        <div class="col-span-12 md:col-span-6 lg:col-span-4">
             @include(\'components.filters.select-equals\', [
-                \'placeholder\' => \'' . Str::ucfirst($translatedName) . '\',
+                \'label\' => \'' . Str::ucfirst($translatedName) . '\',
                 \'name\' => \'' . $column . '\',
                 \'options\' => $' . Str::of($column)->beforeLast('_id')->camel() . 'Options
             ])
@@ -555,7 +556,7 @@ public function filterInputsBuilder(string $column, string $translatedName): arr
         'select2' =>
         '        <div class="col-span-12 md:col-span-6 lg:col-span-4">
             @include(\'components.filters.select2-equals\', [
-                \'placeholder\' => \'' . Str::ucfirst($translatedName) . '\',
+                \'label\' => \'' . Str::ucfirst($translatedName) . '\',
                 \'name\' => \'' . $column . '\',
                 \'options\' => $' . Str::of($column)->beforeLast('_id')->camel() . 'Options
             ])
@@ -564,7 +565,7 @@ public function filterInputsBuilder(string $column, string $translatedName): arr
         'boolean' =>
         '        <div class="col-span-12 md:col-span-6 lg:col-span-4">
             @include(\'components.filters.select-equals\', [
-                \'placeholder\' => \'' . Str::ucfirst($translatedName) . '\',
+                \'label\' => \'' . Str::ucfirst($translatedName) . '\',
                 \'name\' => \'' . $column . '\',
                 \'options\' => collect(["Falso", "Verdadeiro"])
             ])
